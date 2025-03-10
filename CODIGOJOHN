@@ -1,1 +1,39 @@
+Programacion en ensamblador 
+Equipo voltios 
+
+JMP boot
+
+stackTop    EQU 0xFF    ; Dirección inicial de la pila
+txtDisplay  EQU 0x2E0   ; Dirección de memoria del display
+
+mensaje:	DB "El equipo voltios es el mejor XS", 0	; Nueva cadena con terminador nulo
+
+boot:
+	MOV SP, stackTop	; Inicializa el stack pointer
+
+	MOV C, mensaje		; C apunta a la cadena "El equipo voltios es el mejor XS"
+	MOV D, txtDisplay	; D apunta a la dirección del display
+
+	CALL print			; Llamar a la subrutina de impresión
+	HLT					; Detener ejecución
+
+print:					; Subrutina para imprimir el mensaje
+	PUSH A
+	PUSH B
+
+	MOV B, 0			; Registro B usado para la comparación
+
+.loop:
+	MOVB AL, [C]		; Obtener carácter actual
+	MOVB [D], AL		; Escribirlo en el display
+	INC C				; Avanzar al siguiente carácter en la cadena
+	INC D				; Avanzar en el display
+
+	CMPB BL, [C]		; Verificar si es el fin de la cadena (terminador `0`)
+	JNZ .loop			; Si no es el final, continuar
+
+	POP B
+	POP A
+	RET					; Regresar de la subrutina
+
 
