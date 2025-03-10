@@ -37,3 +37,32 @@ print:					; Subrutina para imprimir el mensaje
 	RET					; Regresar de la subrutina
 
 
+
+JMP boot
+
+vslDisplay EQU 0x300  ; Dirección base del framebuffer
+
+sprite: 
+    DB "\x18\x3C\x66\x66\x7E\x66\x66\x66"  ; Imagen "A" en formato binario
+    DB "\x66\x66\x66\x66\x66\x66\x66\x66"
+    DB "\x66\x66\x66\x66\x66\x66\x66\x66"
+    DB "\x66\x66\x66\x66\x66\x66\x66\x66"
+    DB "\x66\x66\x66\x66\x66\x66\x66\x66"
+    DB "\x66\x66\x66\x66\x66\x66\x66\x66"
+    DB "\x66\x66\x66\x66\x66\x66\x66\x66"
+    DB "\x66\x66\x66\x66\x66\x66\x66\x66"
+
+boot:
+    MOV C, sprite        ; C apunta al sprite (datos de imagen)
+    MOV D, vslDisplay   ; D apunta al framebuffer (pantalla)
+
+.loop:
+    MOVB AL, [C]   ; Cargar el byte actual del sprite en AL
+    MOVB [D], AL   ; Escribirlo en la memoria de video
+    INC C          ; Avanzar al siguiente byte del sprite
+    INC D          ; Avanzar al siguiente píxel en pantalla
+    CMP D, 0x400   ; Verificar si hemos terminado de dibujar
+    JNZ .loop      ; Si no, continuar en el bucle
+    HLT            ; Detener ejecución
+
+
