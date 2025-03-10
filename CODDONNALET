@@ -5,15 +5,14 @@
 
        JMP boot
 
-stackTop    EQU 0xFF    ; Initial SP
+stackTop    EQU 0xFF  ; Initial SP
 txtDisplay  EQU 0x2E0
 
 hello:	DB "Hello World!"	; Output string
 		DB 0				; String terminator
         
 vslDisplay EQU 0x300
-
-sprite: 
+ 
     
 sprite: 
     DB  "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
@@ -53,10 +52,20 @@ print:				; Print string
 	INC C
 	INC D
 	CMPB BL, [C]	; Check if string terminator
-    
-	CMP D, 0x400
-	JNZ .loop		; Jump back to loop if not
-
+    JNZ .loop		; Jump back to loop if not
+    INC C
+	MOV D, vslDisplay
+    CALL .loop2
+	; Jump back to loop if not
+.loop2:
+	MOVB AL, [C]	; Get character
+	MOVB [D], AL	; Write to output
+	INC C
+	INC D
+    CMP D, 0x400
+	JNZ .loop2	
+    HLT
 	POP B
 	POP A
+    
 	RET
