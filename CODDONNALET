@@ -8,7 +8,7 @@
 stackTop    EQU 0xFF  ; Initial SP
 txtDisplay  EQU 0x2E0
 
-hello:	DB "Hello World!"	; Output string
+hello:	DB "!El equipo voltios es el mejor!"	; Output string
 		DB 0				; String terminator
         
 vslDisplay EQU 0x300
