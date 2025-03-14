@@ -1,15 +1,19 @@
 ;Dibujo de My melody en display 
-;Prints a 16x16 sprite into the visual display
+;Equipo Voltios
+;Cortes Romero Donnalet Guadalupe
+;Trujillo Franco Karla Yorleni
+;Cervantes Rendon Jonathan 
+;Isac Solano Gonzalez Josue
 
-       JMP boot
+       JMP boot ;indica un salto a la etiqueta boot
 
-stackTop    EQU 0x3AA  ; Initial SP
-txtDisplay  EQU 0x2E0
+stackTop    EQU 0x3AA  ; donde inicia la pila
+txtDisplay  EQU 0x2E0 ;dirección de memoria
 
-hello:	DB "!El equipo voltios es el mejor!"	; Output string
-		DB 0				; String terminator
+hello:	DB "!El equipo voltios es el mejor!"	; se define cadena de texto
+		DB 0				; se almacena cada caracter en la memoria
         
-vslDisplay1 EQU 0x300
+vslDisplay1 EQU 0x300 ; se define la direccion de memoria para dibujar el sprite
  
     
 sprite1: 
@@ -30,7 +34,7 @@ sprite1:
     DB  "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
     DB  "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
 
-vslDisplay2 EQU 0x600
+vslDisplay2 EQU 0x600 ; se define la direccion de memoria para dibujar el sprite
 sprite2: 
     DB  "\x00\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
     DB  "\xFF\xFF\x00\x00\x00\x00\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
@@ -48,42 +52,43 @@ sprite2:
     DB  "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
     DB  "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
     DB  "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
-
+ ; DB almacena un byte 
+ ; FF color blanco, 00 color negro, F4 color naranja, F2 color rosa
 boot:
-	MOV SP, stackTop	; Set SP
-	MOV C, hello		; Point register C to string
-	MOV D, txtDisplay	; Point register D to output
-	CALL print
-	HLT				; Halt execution
+	MOV SP, stackTop	; inicia el puntero 
+	MOV C, hello		; apunta c al mensaje de texto
+	MOV D, txtDisplay	; apunta d a la direccion donde se imprime el texto
+	CALL print			; llama a la función print para imprimir el texto
+	HLT				; detiene la ejecució del programa
     	MOV C, sprite2		; C points to the sprite
 	MOV D, vslDisplay2	; D points to the fb
-    MOV C, sprite2
+   
 
 print:				; Print string
 	PUSH A
-	PUSH B
-	MOV B, 0
+	PUSH B			; guarda los registros para no perder su valor
+	MOV B, 0		; se usa B como un comparador 
 .loop:
-	MOVB AL, [C]	; Get character
-	MOVB [D], AL	; Write to output
+	MOVB AL, [C]	; cargar el caracter
+	MOVB [D], AL	; lo escribe en la dirección
 	INC C
-	INC D
-	CMPB BL, [C]	; Check if string terminator
-    JNZ .loop		; Jump back to loop if not
+	INC D			; avanza a la siguiente posición
+	CMPB BL, [C]	; compara si el caracter es 0
+    JNZ .loop		; si no es el final sigue el bucle
     INC C
-	MOV D, vslDisplay1
+	MOV D, vslDisplay1 ; apunta a la direccion de la pantalla donde se escribirá el sprite
     CALL .loop2
-	; Jump back to loop if not
+	
 .loop2:
 	MOVB AL, [C]	; Get character
 	MOVB [D], AL	; Write to output
 	INC C
 	INC D
-    CMP D, 0x400
+    CMP D, 0x400 	; compara si D ha alcanzado la dirección limite 
 	JNZ .loop2	
-    HLT
+    HLT				; detiene la ejecución
 	POP B
-	POP A
+	POP A 			; restaura valores
    
     
-	RET
+	RET				; retorna al código que llamó la función
